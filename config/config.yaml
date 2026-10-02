@@ -1,0 +1,34 @@
+# Runtime parameters — loaded separately from config/agent.yaml (the static
+# discovery manifest) and passed to the graph as Graph(config=...).
+max_retry: 3
+timeout_seconds: 30
+# This is a TrustLevel.INTERNAL agent whose sole action is a real GitLab API call
+# requiring the deployment's own `gitlab_api_token` secret. The shared provisional
+# STG pipeline provisions no such per-customer secret (by design — there is no real
+# target GitLab instance to write to in a generic smoke test), so the correct STG
+# invoke result is a clean fail-closed MissingSecret error, not success.
+stg_expected_status: "error"
+# Domain config — SSRF endpoint allowlist (security-officer-owned).
+# Resolved webhook endpoints MUST match one of these (https-pinned,
+# exact or registered-prefix) or creation is hard-blocked. Empty/unset
+# is a fail-fast config error — never default-allow.
+# STG smoke-test value — matches the worked example in docs/07_operation_guide.md.
+# A real deployment replaces this with the customer's own approved endpoint(s).
+allowed_endpoints:
+  - "https://ci.example.com/trigger"
+# Base URL of the GitLab instance this deployment targets. No default — the node
+# fails closed until the deployment supplies it (see docs/07_operation_guide.md).
+# STG smoke-test value — matches the worked example in docs/07_operation_guide.md.
+gitlab_base_url: "https://gitlab.example"
+# Fixed GitLab hook event flags the agent is allowed to set.
+allowed_event_flags:
+  - "push_events"
+  - "merge_requests_events"
+  - "issues_events"
+  - "tag_push_events"
+  - "note_events"
+  - "pipeline_events"
+  - "job_events"
+  - "wiki_page_events"
+  - "deployment_events"
+  - "releases_events"
